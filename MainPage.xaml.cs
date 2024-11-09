@@ -1,6 +1,6 @@
 ﻿namespace FindMe_GO
 {
-    public partial class MainPage : ContentPage
+    public partial class MainPage
     {
         string _baseUrl = "https://bing.com/maps/default.aspx?cp=";
         public string Username { get; set; }
@@ -15,7 +15,7 @@
             var permission = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
             if (permission == PermissionStatus.Granted)
             {
-                ShareLocation();
+                await ShareLocation();
             }
             else
             {
@@ -26,7 +26,7 @@
 
             if(request == PermissionStatus.Granted)
             {
-                ShareLocation();
+                await ShareLocation();
             }
             else
             {
@@ -49,14 +49,24 @@
             var locationRequest = new GeolocationRequest(GeolocationAccuracy.Best);
             var location = await Geolocation.GetLocationAsync(locationRequest);
 
-            await Share.RequestAsync(new ShareTextRequest
-            {
-                Subject = "Find me!",
-                Title = "Find me!",
-                Text = $"{Username} is sharing their location with you",
-                Uri = $"{_baseUrl}{location.Latitude}~{location.Longitude}",
-                
-            });
+           
+                // await Share.RequestAsync(new ShareTextRequest
+                // {
+                //     Subject = "Find me!",
+                //     Title = "Find me!",
+                //     Text = $"{Username} is sharing their location with you",
+                //     Uri = $"{_baseUrl}{location.Latitude}~{location.Longitude}",
+                // });
+                if (location != null)
+                {
+                    NavigateToMap(location);
+                }
+           
+        }
+
+        private async void NavigateToMap(Location location)
+        {
+            await Application.Current.MainPage.Navigation.PushAsync(new MapPage(location));
         }
     }
 
